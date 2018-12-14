@@ -6,7 +6,8 @@ CPPFLAGS = -I/usr/local/include
 
 
 FC = ifort
-LD = ifort -L/usr/local/netcdf-4.3.3.1/lib/ # when running `module show netcdf-4.3.3.1-openmpi-intel` it shows what directory should be used for LD options. Should apparently work with shell variable $LD_LIBRARY_PATH, but it doesn't seem to. 
+#LD = ifort -L/usr/local/netcdf-4.3.3.1/lib/ # when running `module show netcdf-4.3.3.1-openmpi-intel` it shows what directory should be used for LD options. Should apparently work with shell variable $LD_LIBRARY_PATH, but it doesn't seem to. 
+LD = ifort -L/software/netcdf-4.2-el6-x86_64/lib
 CC = icc 
 LDFLAGS = -lnetcdff -lnetcdf -shared-intel -lpthread -lhdf5 -lhdf5_hl
 CFLAGS = -D__IFC

@@ -28,9 +28,6 @@ from netCDF4 import Dataset
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 import os
-import sys
-
-#ice_edge=sys.argv[1]
 
 def write_land(exp,land_mode='continents',boundaries=[20.,80.,0.,180.],continents=['all'],topo_mode='sauliere2012',mountains=['all'],topo_gauss=[40.,40.,20.,10.,3500.],waterworld=False):
 
@@ -115,38 +112,13 @@ def write_land(exp,land_mode='continents',boundaries=[20.,80.,0.,180.],continent
     elif land_mode=='none':  
         land_array = np.zeros((nlat,nlon))
         
-        
     
-    elif land_mode=='zonal_land': ## A zonal land with zonal land and topography
-        real_land_file = '/project2/tas1/pragallva/Fall_quarter_2017/land_files/Ruth_full1.nc'
-        land_file = Dataset(real_land_file, 'r', format='NETCDF3_CLASSIC')
-        v_var=land_file.variables
-        source_mask=v_var['land_mask'][:]
-                
-        zonal_mask = np.squeeze(np.nanmean(source_mask,axis=1))              
-        for i in range(nlat):
-            if zonal_mask[i]>0 :
-                land_array[i,:]=1.0
-            else:
-                land_array[i,:]=0.0 
-         # This will be modified later, depending on what Tiffany accepts as zonal land
-            
 # Next produce a topography array
     if topo_mode == 'none':
         topo_array = np.zeros((nlat,nlon))
         
-        
-    elif topo_mode=='zonal_topo': ## A zonal land with zonal land and topography
-        real_land_file = '/project2/tas1/pragallva/Fall_quarter_2017/land_files/Ruth_full1.nc'
-        land_file = Dataset(real_land_file, 'r', format='NETCDF3_CLASSIC')
-        v_var=land_file.variables
-        source_zsurf=v_var['zsurf'][:]             
-        zonal_surf = np.squeeze(np.nanmean(source_zsurf,axis=1))
-        for i in range(nlat):
-            topo_array[i,:]=zonal_surf[i]          
-        
     elif topo_mode == 'sauliere2012':
-        # Rockys from Saulexitiere 2012
+        # Rockys from Sauliere 2012
         h_0 = 2670.
         central_lon = 247.5
         central_lat = 40.
@@ -183,6 +155,7 @@ def write_land(exp,land_mode='continents',boundaries=[20.,80.,0.,180.],continent
             topo_array[idx_tibet] =  h_arr_tibet[idx_tibet]
         else:
             print('No valid mountain options detected for Sauliere 2012 topography')
+
             
     elif topo_mode == 'gaussian':
         #Options to define simple Gaussian Mountain
@@ -203,6 +176,7 @@ def write_land(exp,land_mode='continents',boundaries=[20.,80.,0.,180.],continent
     else:
         print('Invalid topography option given')
         
+
     if waterworld != True:      #Leave flexibility to allow aquamountains!
         idx = (land_array == 0.) & (topo_array != 0.)
         topo_array[idx] = 0. 
@@ -210,8 +184,7 @@ def write_land(exp,land_mode='continents',boundaries=[20.,80.,0.,180.],continent
 
     #Write land and topography arrays to file
     #topo_filename = GFDL_BASE + '/exp/' + exp + '/input/land.nc'
-    topo_filename='/project2/tas1/pragallva/Summer_quarter_2018/land_files/'+exp+'.nc'
-   # topo_filename=os.getcwd()+'/'+exp+'.nc'
+    topo_filename='/project2/tas1/pragallva/Fall_quarter_2017/land_files/'+exp+'.nc'
     topo_file = Dataset(topo_filename, 'w', format='NETCDF3_CLASSIC')
     lat = topo_file.createDimension('lat', nlat)
     lon = topo_file.createDimension('lon', nlon)
@@ -226,25 +199,28 @@ def write_land(exp,land_mode='continents',boundaries=[20.,80.,0.,180.],continent
     topo_file.close()
     print('Output written to: ' + topo_filename)
 
+
 #    #Show configuration on screen to allow checking
 
-#    lon_0 = lons.mean()
-#    lat_0 = lats.mean()
-#    m = Basemap(lat_0=lat_0,lon_0=lon_0)
-#    xi, yi = m(lon_array, lat_array)
-#    plt.figure()
-#    if land_mode != 'none':
-#        m.contour(xi,yi,land_array,colors='k')
-#    if topo_mode != 'none':
-#        cs = m.contourf(xi,yi,topo_array,50, cmap=plt.get_cmap('RdBu_r'))
-#        cb = plt.colorbar(cs, shrink=0.5, extend='both')
-#    plt.xticks(np.linspace(0,360,13))
-#    plt.yticks(np.linspace(-90,90,7))
-#    plt.show()
+
+    lon_0 = lons.mean()
+    lat_0 = lats.mean()
+    m = Basemap(lat_0=lat_0,lon_0=lon_0)
+    xi, yi = m(lon_array, lat_array)
+    plt.figure()
+    if land_mode != 'none':
+        m.contour(xi,yi,land_array)
+    if topo_mode != 'none':
+        cs = m.contourf(xi,yi,topo_array, cmap=plt.get_cmap('RdBu_r'))
+        cb = plt.colorbar(cs, shrink=0.5, extend='both')
+    plt.xticks(np.linspace(0,360,13))
+    plt.yticks(np.linspace(-90,90,7))
+    plt.show()
 
 
-#if __name__ == "__main__":
 
-    #write_land('antarctica'+str(ice_edge),land_mode='two_square', boundaries=[int(ice_edge),90.,0.,360.,-95.,-1*int(ice_edge),0.,360.], continents=None, topo_mode= None, mountains=None, topo_gauss=None, waterworld=True)
+if __name__ == "__main__":
 
-#lgf 
+    write_land('land_test')#,land_mode='two_square',boundaries=[30.,80.,0.,180.,0.,30.,180.,360])
+
+

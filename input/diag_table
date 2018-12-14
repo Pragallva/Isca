@@ -5,7 +5,7 @@
  "4xday",   6, "hours", 1, "days", "time",
  "1x20days",   480, "hours", 1, "days", "time",
 # = diagnostic field entries =
-# module_name, field_name, output_name, file_name, time_sampling, time_avg, other_opts, precision
+# module_name,     field_name,           output_name,       file_name,  time_sampling, time_avg, other_opts, precision
  "dynamics",        "ps",                  "ps",                 "4xday",       "all", .false., "none", 2,
  "dynamics",        "bk",                  "bk",                 "4xday",       "all", .false., "none", 2,
  "dynamics",        "pk",                  "pk",                 "4xday",       "all", .false., "none", 2,

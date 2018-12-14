@@ -1,5 +1,6 @@
 # The following three directory may need to set.
-NETCDFPATH = /usr/local/netcdf-4.0.1
+#NETCDFPATH = /usr/local/netcdf-4.0.1
+NETCDFPATH = /software/netcdf-4.2-el6-x86_64
 POSTPPATH  = .
 FFLAGS = -I${NETCDFPATH}/include -I/usr/include -fltconsistency -fno-alias -stack_temps -safe_cray_ptr -ftz -assume byterecl -g -O2 -i4 -nowarn -Wp,-w
 LDFLAGS =  -L${NETCDFPATH}/lib -lnetcdff -lnetcdf -lhdf5_hl -lhdf5 -lmpi -lz

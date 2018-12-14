@@ -70,7 +70,7 @@ character(len=10), parameter :: mod_name='atmosphere'
 public :: atmosphere_init, atmosphere, atmosphere_end, atmosphere_domain
 
 !=================================================================================================================================
-logical :: idealized_moist_model = .false.
+logical :: idealized_moist_model = .true.!.false.
 
 namelist/atmosphere_nml/ idealized_moist_model
 

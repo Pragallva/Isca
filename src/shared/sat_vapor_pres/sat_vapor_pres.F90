@@ -542,7 +542,7 @@ private
  logical :: show_bad_value_count_by_slice=.true.
  logical :: show_all_bad_values=.false.
  logical :: use_exact_qs = .false.
- logical :: do_simple             =.false.
+ logical :: do_simple             =.true.!.false.
  logical :: construct_table_wrt_liq = .false.
  logical :: construct_table_wrt_liq_and_ice = .false.
  logical :: do_not_calculate = .false.

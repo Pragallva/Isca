@@ -10,7 +10,7 @@ def plevel_call(nc_file_in,nc_file_out, var_names = '-a', p_levels='default', ma
 
     check_gfdl_directories_set()
 
-    interper = './plevel.sh'
+    interper = '/project/tas1/pragallva/Fall_quarter_2017/Isca/postprocessing/plevel_interpolation/scripts/plevel.sh'
     nc_file = ' -i '+nc_file_in
     out_file = ' -o '+nc_file_out
     if p_levels == 'model':

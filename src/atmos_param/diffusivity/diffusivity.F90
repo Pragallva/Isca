@@ -142,8 +142,8 @@ logical :: ampns               = .false. ! include delta z factor in
 real    :: ampns_max           = 1.0E20  ! limit to reduction factor
                                          ! applied to ri due to delta z
                                          ! factor
-logical :: do_entrain          =.true.
-logical :: do_simple           =.false.
+logical :: do_entrain          =.false.!.true.
+logical :: do_simple           =.true. !.false.
 
 namelist /diffusivity_nml/ fixed_depth, depth_0, frac_inner,&
                            rich_crit_pbl, entr_ratio, parcel_buoy,&

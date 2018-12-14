@@ -3,15 +3,24 @@ set echo
 
 set codeDir = $cwd 
 
-source /opt/modules/default/init/tcsh
-module purge
-module load idb.9.0.12
-module load icc.9.1.045
-module load ifort.9.1.041
-module load mpt-1.14
-module load netcdf-4.0_hdf
-module load hdf5-1.8.1
+#source /opt/modules/default/init/tcsh
+#module purge
+#module load idb.9.0.12
+#module load icc.9.1.045
+#module load ifort.9.1.041
+#module load mpt-1.14
+#module load netcdf-4.0_hdf
+#module load hdf5-1.8.1
 
+#module purge
+#module load openmpi/1.6+intel-12.1
+#module load netcdf/4.2+intel-12.1
+#module load git/2.7
+#module load hdf5/1.8
+
+#export F90=mpif90
+#export CC=mpicc
+                
 
 ifort -o PLEV.exe \
          $codeDir/plev_constants.F90 $codeDir/moisture_convert.F90 \

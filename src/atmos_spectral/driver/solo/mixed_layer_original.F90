@@ -110,16 +110,13 @@ logical :: do_sc_sst        = .false. !mj
 logical :: specify_sst_over_ocean_only = .false.
 character(len=256) :: sst_file
 character(len=256) :: land_option = 'none'
-logical :: land_option_zonal      = .false.
 real,dimension(10) :: slandlon=0,slandlat=0,elandlon=-1,elandlat=-1
 !s End mj extra options
 
-character(len=256) :: qflux_file_name  = 'willbespecified1'!'INPUT/ocean_qflux.nc'
-character(len=256) :: qflux_field_name = 'willbespecified2'!'ocean_qflux'
+character(len=256) :: qflux_file_name  = 'INPUT/ocean_qflux.nc'
+character(len=256) :: qflux_field_name = 'ocean_qflux'
 
-character(len=256) :: ice_file_name  = 'willbespecified'!'siconc_clim_amip'
-character(len=256) :: ice_field_name  = 'willbespecified'!'siconc_clim_amip'
-
+character(len=256) :: ice_file_name  = 'siconc_clim_amip'
 real    :: ice_albedo_value = 0.7
 real    :: ice_concentration_threshold = 0.5
 logical :: update_albedo_from_ice = .false.
@@ -136,16 +133,19 @@ namelist/mixed_layer_nml/ evaporation, depth, qflux_amp, qflux_width, tconst,&
                               albedo_choice,higher_albedo,albedo_exp,        &  !mj
                               albedo_cntr,albedo_wdth,lat_glacier,           &  !mj
                               do_read_sst,do_sc_sst,sst_file,                &  !mj
-                              land_option,land_option_zonal,slandlon,slandlat,&  !mj
+                              land_option,slandlon,slandlat,                 &  !mj
                               elandlon,elandlat,                             &  !mj
                               land_h_capacity_prefactor,                     &  !s
                               land_albedo_prefactor,                         &  !s
                               load_qflux,qflux_file_name,qflux_field_name,time_varying_qflux, &
-                              update_albedo_from_ice, ice_file_name,ice_field_name,         &
+                              update_albedo_from_ice, ice_file_name,         &
                               ice_albedo_value, specify_sst_over_ocean_only, &
                               ice_concentration_threshold,                   &
                               add_latent_heat_flux_anom,flux_lhe_anom_file_name,&
                               flux_lhe_anom_field_name
+
+! Default field name for qflux_field_name is 'ocean_qflux', but it can be changed through the mixed_layer_nml here -- Added by
+! Pragallva (02/21/2018)
 
 !=================================================================================================================================
 
@@ -171,7 +171,7 @@ real, allocatable, dimension(:,:)   ::                                        &
      rad_lat_2d,            &   ! latitude in radians
      flux_lhe_anom, flux_q_total
 
-real, allocatable, dimension(:)   :: deg_lat, deg_lon, new_albedo, new_lshcap ! last two for adding zonal land
+real, allocatable, dimension(:)   :: deg_lat, deg_lon
 
 real, allocatable, dimension(:,:)   ::                                        &
      gamma_t,               &   ! Used to calculate the implicit
@@ -262,8 +262,6 @@ allocate(flux_lhe_anom           (is:ie, js:je))
 allocate(flux_q_total            (is:ie, js:je))
 allocate(deg_lat                 (js:je))
 allocate(deg_lon                 (is:ie))
-allocate(new_lshcap              (js:je))
-allocate(new_albedo              (js:je))
 allocate(gamma_t                 (is:ie, js:je))
 allocate(gamma_q                 (is:ie, js:je))
 allocate(en_t                    (is:ie, js:je))
@@ -375,7 +373,7 @@ ocean_qflux = 0.
 if (load_qflux) then
 
 	if (time_varying_qflux) then
-	   call interpolator_init( qflux_interp, trim(qflux_file_name)//'.nc', rad_lonb_2d, rad_latb_2d, (/trim(qflux_field_name)/), data_out_of_bounds=(/CONSTANT/) )
+	   call interpolator_init( qflux_interp, trim(qflux_file_name)//'.nc', rad_lonb_2d, rad_latb_2d, data_out_of_bounds=(/CONSTANT/) )
 	else
 
 	   if(file_exist(trim(qflux_file_name))) then
@@ -427,13 +425,6 @@ if(trim(land_option) .eq. 'input') then
 
 where(land) albedo = land_albedo_prefactor * albedo
 
- if (land_option_zonal) then
-    new_albedo = sum(albedo, DIM=1)/size(albedo, DIM=1)
-    ! above line averages the albedo zonally -- added by Pragallva 02/07/2018
-    do i=is,ie
-       albedo(i,:) = new_albedo(:)
-    enddo
- endif
 endif
 
 !mj MiMA albedo choices.
@@ -530,15 +521,8 @@ endif
             enddo
          endif
 	else  !trim(land_option) .eq. 'input'
-	   where(land) land_sea_heat_capacity = land_h_capacity_prefactor*land_sea_heat_capacity
-           if (land_option_zonal) then
-                new_lshcap = sum(land_sea_heat_capacity, DIM=1)/size(land_sea_heat_capacity, DIM=1)
-                ! above line averages the heat capacity zonally -- added by Pragallva 02/07/2018
-                do i=is,ie
-                   land_sea_heat_capacity(i,:) = new_lshcap(:)
-                enddo
-           endif 
-        endif !end of if (trim(land_option) .ne. 'input')
+		where(land) land_sea_heat_capacity = land_h_capacity_prefactor*land_sea_heat_capacity
+	endif !end of if (trim(land_option) .ne. 'input')
     endif !end of if(.not.do_sc_sst)
 
 if ( id_heat_cap > 0 ) used = send_data ( id_heat_cap, land_sea_heat_capacity )
@@ -641,7 +625,7 @@ beta_lw = drdt_surf
 
 ! If time-varying qflux then update value
 if(load_qflux.and.time_varying_qflux) then
-         call interpolator( qflux_interp, Time, ocean_qflux, trim(qflux_field_name) )
+         call interpolator( qflux_interp, Time, ocean_qflux, trim(qflux_file_name) )
 
 	 if(update_albedo_from_ice) then
 	      where (land_ice_mask) ocean_qflux=0.
@@ -672,16 +656,6 @@ if(do_sc_sst) then !mj sst read from input file
 	 else
 	     delta_t_surf = sst_new - t_surf
 	     t_surf = t_surf + delta_t_surf
-             
-             ! Small piece of code added by Pragallva on 30th March, 2018 to back calculate ocean_qfluxes 
-             if((.not.do_qflux).and.(.not.load_qflux)) then
-                 eff_heat_capacity = land_sea_heat_capacity + t_surf_dependence * dt
-                 corrected_flux    = - eff_heat_capacity * delta_t_surf/dt
-                 ocean_qflux       = - corrected_flux - net_surf_sw_down - surf_lw_down + alpha_t * CP_AIR + alpha_lw
-                 !where (land) ocean_qflux=ocean_qflux*0.
-             end if
-             ! If sst is prescribed. This is only for the case when .not.specify_sst_over_ocean_only. 
-
 	 endif
 	     
 end if
@@ -737,8 +711,7 @@ type(time_type), intent(in)       :: Time
 albedo_inout=albedo_initial
 
 if(update_albedo_from_ice) then
-        !! Added by Pragallva on 5th July, 2018 to remove any negative and greater than 100% ice concentration !!
-        ice_concentration = amax1(amin1(ice_concentration, 1.0), 0.0)
+
 	where(ice_concentration.gt.ice_concentration_threshold) 
 		albedo_inout=ice_albedo_value
 	end where
@@ -756,7 +729,7 @@ subroutine read_ice_conc(Time)
 type(time_type), intent(in)       :: Time
 
 
-call interpolator( ice_interp, Time, ice_concentration, trim(ice_field_name) )
+call interpolator( ice_interp, Time, ice_concentration, trim(ice_file_name) )
 if ( id_ice_conc > 0 ) used = send_data ( id_ice_conc, ice_concentration, Time )
 
 end subroutine read_ice_conc

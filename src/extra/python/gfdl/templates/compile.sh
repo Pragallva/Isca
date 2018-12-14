@@ -15,24 +15,27 @@ template_debug={{ template_dir }}/mkmf.template.debug
 execdir={{ execdir }}        # where code is compiled and executable is created
 executable=$execdir/fms_moist.x
 
-netcdf_flags=`nf-config --fflags --flibs`
 
 # 2. Load the necessary tools into the environment
-module purge
+#module purge
 source {{ srcdir }}/src/extra/loadmodule
 module list
+
+
+netcdf_flags=`nf-config --fflags --flibs`
+
 ulimit -s unlimited # Set stack size to unlimited
 export MALLOC_CHECK_=0
 
 #--------------------------------------------------------------------------------------------------------
 # compile combine tool
 cd $ppdir
-# cc -O -c `nf-config --cflags` mppnccombine.c
+# cc -O -c `nc-config --cflags` mppnccombine.c
 # if [ $? != 0 ]; then
 #     echo "ERROR: could not compile combine tool"
 #     exit 1
 # fi
-# cc -O -o mppnccombine.x `nf-config --libs`  mppnccombine.o
+# cc -O -o mppnccombine.x `nc-config --libs`  mppnccombine.o
 # if [ $? != 0 ]; then
 #     echo "ERROR: could not compile combine tool"
 #     exit 1

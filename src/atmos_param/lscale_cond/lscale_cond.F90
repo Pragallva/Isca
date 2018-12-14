@@ -54,8 +54,8 @@ private
 !   --- namelist ----
 
 real    :: hc=1.00
-logical :: do_evap=.false.
-logical :: do_simple =.false.
+logical :: do_evap=.true.!.false.
+logical :: do_simple =.true.!.false.
 
 namelist /lscale_cond_nml/  hc, do_evap, do_simple
 

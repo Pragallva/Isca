@@ -1,13 +1,24 @@
 #!/bin/tcsh -f
-source /opt/modules/default/init/tcsh
-module purge
-module load ifort.9.1.041
-module load icc.9.1.045
-module load mpt-1.18
-module load idb.9.1.045
-module load scsl-1.5.1.0
-module load netcdf-4.0
-module list
+
+#source /opt/modules/default/init/tcsh
+
+#module load ifort.9.1.041
+#module load icc.9.1.045
+#module load mpt-1.18
+#module load idb.9.1.045
+#module load scsl-1.5.1.0
+#module load netcdf-4.0
+#module list
+
+#module purge
+#module load openmpi/1.6+intel-12.1
+#module load netcdf/4.2+intel-12.1
+#module load git/2.7
+#module load hdf5/1.8
+
+#export F90=mpif90
+#export CC=mpicc
+                
 setenv NC_BLKSZ 64K
 
 rm *.o PLEV.exe >& /dev/null

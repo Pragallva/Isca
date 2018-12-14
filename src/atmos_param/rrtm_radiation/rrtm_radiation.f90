@@ -121,9 +121,9 @@
         character(len=256) :: sw_flux_file='sw_flux'          !  file name to read fluxes
         logical            :: do_read_lw_flux=.false.         ! read LW surface fluxes from external file?
         character(len=256) :: lw_flux_file='lw_flux'          !  file name to read fluxes
-        logical            :: do_read_ozone=.false.           ! read ozone from an external file?
+        logical            :: do_read_ozone=.true.!.false.           ! read ozone from an external file?
                                                               !  this is the only way to get ozone into the model
-        character(len=256) :: ozone_file='ozone'              !  file name of ozone file to read
+        character(len=256) :: ozone_file='ozone_1990'!'ozone'              !  file name of ozone file to read
         logical            :: do_read_h2o=.false.             ! read water vapor from an external file?
         character(len=256) :: h2o_file='h2o'                  !  file name of h2o file to read
         logical            :: do_read_co2=.false.             ! read co2 concentration from an external file?

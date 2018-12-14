@@ -101,19 +101,19 @@ logical            :: module_is_initialized = .false.
 !-------------------- namelist -----------------------------------------
 
  logical :: do_shallow_conv  = .false.
- logical :: do_mellor_yamada = .true.
+ logical :: do_mellor_yamada = .false. !.true.
  logical :: do_diffusivity         = .false.
  logical :: do_molecular_diffusion = .false.
  logical :: do_edt                 = .false.
  logical :: do_stable_bl     = .false.
- logical :: use_tau          = .true.
+ logical :: use_tau          = .false.!.true.
  logical :: do_entrain    = .false.
- logical :: do_simple = .false. 
+ logical :: do_simple = .true. !.false. 
 
  character(len=24) :: gust_scheme  = 'constant' ! valid schemes are:
                                                 !   => 'constant'
                                                 !   => 'beljaars'
- real              :: constant_gust = 1.0
+ real              :: constant_gust = 0.0 !1.0
  real              :: gust_factor   = 1.0
  
  namelist /vert_turb_driver_nml/ do_shallow_conv, do_mellor_yamada, &

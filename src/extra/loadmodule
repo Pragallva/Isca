@@ -1,6 +1,13 @@
 echo loadmodules
 
 module purge
-module load hdf5/1.8.11  
-module load netcdf-4.3.3.1-openmpi-intel
-module load git/2.1.2
+#module load intel
+#module load openmpi/1.10+pgi-2016
+module load openmpi/1.6+intel-12.1 
+#module load intelmpi/5.0 
+module load netcdf/4.2+intel-12.1
+module load git/2.7
+module load hdf5/1.8
+
+export F90=mpif90
+export CC=mpicc

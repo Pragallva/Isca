@@ -6,17 +6,31 @@ import time
 import pdb
 import subprocess
 
+
+## I (Pragallva Barpanda) made some temporaray changes to the file as of January 10th, 2018 
+## to get the interpolated data to plevel coordinate system  
+
+dirc=sys.argv
+
+import logging
+log_directory='/project2/tas1/pragallva/Fall_quarter_2017/codes/shell_script/log/'+dirc[1]+'_'+'interp'
+logging.basicConfig(filename=log_directory+'.log',level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+
+
 start_time=time.time()
-base_dir='/scratch/sit204/Data_2013/'
-exp_name_list = ['no_ice_flux_lhe_exps_q_flux_hadgem_anoms_3']
-avg_or_daily_list=['monthly']
+base_dir='/project2/tas1/pragallva/Fall_quarter_2017/exp_data/land'
+
+file_name=dirc[1]
+exp_name_list = [file_name]
+avg_or_daily_list=['6hourly']
 start_file=287
 end_file=288
-nfiles=(end_file-start_file)+1
+#nfiles=(end_file-start_file)+1
+nfiles=1
 
 do_extra_averaging=False #If true, then 6hourly data is averaged into daily data using cdo
 group_months_into_one_file=False # If true then monthly data files and daily data files are merged into one big netcdf file each.
-level_set='standard' #Default is the standard levels used previously. ssw_diagnostics are the ones blanca requested for MiMa validation
+level_set='Prachi_diagnostics' #Default is the standard levels used previously. ssw_diagnostics are the ones blanca requested for MiMa validation
 mask_below_surface_set=' ' #Default is to mask values that lie below the surface pressure when interpolated. For some applications, e.g. Tom Clemo's / Mark Baldwin's stratosphere index, you want to have values interpolated below ground, i.e. as if the ground wasn't there. To use this option, this value should be set to '-x '. 
 
 
@@ -42,7 +56,7 @@ if level_set=='standard':
     var_names['monthly']='-a slp height'
     var_names['pentad']='-a slp height'    
     var_names['timestep']='-a'
-    var_names['6hourly']='ucomp slp height vor t_surf vcomp omega'
+    var_names['6hourly']='ucomp slp height vor t_surf vcomp omega temp'
     var_names['daily']='ucomp slp height vor t_surf vcomp omega temp'
     file_suffix='_interp_new_height_temp'
 
@@ -58,6 +72,12 @@ elif level_set=='tom_diagnostics':
     mask_below_surface_set='-x '
     file_suffix='_tom_mk2'
 
+elif level_set=='Prachi_diagnostics':
+    var_names['6hourly']='ucomp slp height vor t_surf vcomp omega temp'
+    plevs['6hourly']=' -p "10 30 100 300 500 700 1000 3000 5000 7000 10000 15000 20000 25000 30000 40000 50000 60000 70000 75000 80000 85000 90000 95000 100000"'
+    file_suffix='prachi'
+
+
 
 for exp_name in exp_name_list:
     for n in range(nfiles):
@@ -71,9 +91,12 @@ for exp_name in exp_name_list:
             if n+start_file < 10:
                 number_prefix='00'
 
-            nc_file_in = base_dir+'/'+exp_name+'/run'+number_prefix+str(n+start_file)+'/atmos_'+avg_or_daily+'.nc'
-            nc_file_out = out_dir+'/'+exp_name+'/run'+number_prefix+str(n+start_file)+'/atmos_'+avg_or_daily+file_suffix+'.nc'
-
+            #nc_file_in = base_dir+'/'+exp_name+'/run'+number_prefix+str(n+start_file)+'/atmos_'+avg_or_daily+'.nc'
+            #nc_file_out = out_dir+'/'+exp_name+'/run'+number_prefix+str(n+start_file)+'/atmos_'+avg_or_daily+file_suffix+'.nc'
+ 
+            nc_file_in = base_dir+'/'+exp_name+'.nc'
+            nc_file_out = out_dir+'/'+exp_name+'_plev.nc'
+            
             if not os.path.isfile(nc_file_out):
                 plevel_call(nc_file_in,nc_file_out, var_names = var_names[avg_or_daily], p_levels = plevs[avg_or_daily], mask_below_surface_option=mask_below_surface_set)
             if do_extra_averaging and avg_or_daily=='6hourly':
@@ -101,6 +124,6 @@ if group_months_into_one_file:
                 join_files(nc_file_string,nc_file_out)
 
 print('execution time', time.time()-start_time)
-
+logging.debug('execution time ='+str(time.time()-start_time))
 
 

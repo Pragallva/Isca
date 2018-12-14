@@ -26,9 +26,14 @@ endif
 
 MAKEFLAGS += --jobs=2
 
-NETCDF_ROOT = /usr/local/x64/netcdf-4.1.2
-MPICH_ROOT  = /usr/local/x64/mpich2
-HDF5_ROOT   = /usr/local/x64/hdf5-1.8.6/lib
+NETCDF_ROOT = /software/netcdf-4.2-el6-x86_64
+MPICH_ROOT  = /software/mpich-3.2-el7-x86_64/
+HDF5_ROOT   = /software/hdf5-1.8-el6-x86_64/
+
+#NETCDF_ROOT = /usr/local/x64/netcdf-4.1.2
+#MPICH_ROOT  = /usr/local/x64/mpich2
+#HDF5_ROOT   = /usr/local/x64/hdf5-1.8.6/lib
+
 ZLIB_ROOT   = 
 INCLUDE   = -I$(NETCDF_ROOT)/include -I$(MPICH_ROOT)/include
 

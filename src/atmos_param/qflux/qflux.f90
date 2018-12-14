@@ -7,7 +7,7 @@ module qflux_mod
 
 implicit none
 
-real ::    qflux_amp      = 30.,  &
+real ::    qflux_amp      =  0., & !30.,  &
            qflux_width    = 16.,  &
            warmpool_amp   =  5.,  &
            warmpool_width = 20.  

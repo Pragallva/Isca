@@ -360,7 +360,7 @@ num_fields = 0
 !--------------------------------------------------------------------
 ! open source file containing fields to be interpolated
 !--------------------------------------------------------------------
-src_file = 'INPUT/'//trim(file_name)
+src_file = 'INPUT/'//trim(file_name) !! Made some changes here -- remove the INPUT from the filename
 
 if(file_exist(trim(src_file))) then
    call mpp_open( unit, trim(src_file), action=MPP_RDONLY, &

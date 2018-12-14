@@ -117,9 +117,7 @@ real,dimension(10) :: slandlon=0,slandlat=0,elandlon=-1,elandlat=-1
 character(len=256) :: qflux_file_name  = 'willbespecified1'!'INPUT/ocean_qflux.nc'
 character(len=256) :: qflux_field_name = 'willbespecified2'!'ocean_qflux'
 
-character(len=256) :: ice_file_name  = 'willbespecified'!'siconc_clim_amip'
-character(len=256) :: ice_field_name  = 'willbespecified'!'siconc_clim_amip'
-
+character(len=256) :: ice_file_name  = 'siconc_clim_amip'
 real    :: ice_albedo_value = 0.7
 real    :: ice_concentration_threshold = 0.5
 logical :: update_albedo_from_ice = .false.
@@ -141,7 +139,7 @@ namelist/mixed_layer_nml/ evaporation, depth, qflux_amp, qflux_width, tconst,&
                               land_h_capacity_prefactor,                     &  !s
                               land_albedo_prefactor,                         &  !s
                               load_qflux,qflux_file_name,qflux_field_name,time_varying_qflux, &
-                              update_albedo_from_ice, ice_file_name,ice_field_name,         &
+                              update_albedo_from_ice, ice_file_name,         &
                               ice_albedo_value, specify_sst_over_ocean_only, &
                               ice_concentration_threshold,                   &
                               add_latent_heat_flux_anom,flux_lhe_anom_file_name,&
@@ -737,8 +735,7 @@ type(time_type), intent(in)       :: Time
 albedo_inout=albedo_initial
 
 if(update_albedo_from_ice) then
-        !! Added by Pragallva on 5th July, 2018 to remove any negative and greater than 100% ice concentration !!
-        ice_concentration = amax1(amin1(ice_concentration, 1.0), 0.0)
+
 	where(ice_concentration.gt.ice_concentration_threshold) 
 		albedo_inout=ice_albedo_value
 	end where
@@ -756,7 +753,7 @@ subroutine read_ice_conc(Time)
 type(time_type), intent(in)       :: Time
 
 
-call interpolator( ice_interp, Time, ice_concentration, trim(ice_field_name) )
+call interpolator( ice_interp, Time, ice_concentration, trim(ice_file_name) )
 if ( id_ice_conc > 0 ) used = send_data ( id_ice_conc, ice_concentration, Time )
 
 end subroutine read_ice_conc

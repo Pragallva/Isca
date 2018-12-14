@@ -250,16 +250,16 @@ real :: d622, d378, hlars, gcp, kappa, d608
 ! </NAMELIST>
 
 logical :: no_neg_q              = .false.  ! for backwards compatibility
-logical :: use_virtual_temp      = .true.
+logical :: use_virtual_temp      = .false. !.true.
 logical :: alt_gustiness         = .false.
-logical :: old_dtaudv            = .false.
+logical :: old_dtaudv            = .true.!.false.
 logical :: use_mixing_ratio      = .false.
 real    :: gust_const            =  1.0
 real    :: gust_min              =  0.0
 logical :: ncar_ocean_flux       = .false.
 logical :: ncar_ocean_flux_orig  = .false. ! for backwards compatibility
 logical :: raoult_sat_vap        = .false.
-logical :: do_simple             = .false.
+logical :: do_simple             = .true.!.false.
 
 real    :: land_humidity_prefactor  =  1.0    !s Default is that land makes no difference to evaporative fluxes
 
@@ -280,7 +280,7 @@ namelist /surface_flux_nml/ no_neg_q,             &
                             do_simple,            &
                             land_humidity_prefactor, & !s Added to make land 'dry', i.e. to decrease the evaporative heat flux in areas of land.
                             flux_heat_gp,         &    !s prescribed lower boundary heat flux on a giant planet
-			    diabatic_acce
+			    diabatic_acce       
 
 
 
@@ -557,9 +557,9 @@ subroutine surface_flux_1d (                                           &
   where (avail)
      where (land)
 !s      Simplified land model uses simple prefactor in front of qsurf0. Land is therefore basically the same as sea, but with this prefactor, hence the changes to dedq_surf and dedt_surf also.
-        flux_q    =  rho_drag * (land_humidity_prefactor*q_surf0 - q_atm) ! flux of water vapor  (Kg/(m**2 s))
+        flux_q    =  rho_drag * land_humidity_prefactor*(q_surf0 - q_atm) ! flux of water vapor  (Kg/(m**2 s))
         dedq_surf = 0
-        dedt_surf =  rho_drag * (land_humidity_prefactor*q_sat1 - q_sat) *del_temp_inv
+        dedt_surf =  rho_drag * land_humidity_prefactor*(q_sat1 - q_sat) *del_temp_inv
 !        dedq_surf = rho_drag
 !        dedt_surf = 0
      elsewhere
